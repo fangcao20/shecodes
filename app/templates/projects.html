@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row w-100">
+  <div class="col-2">
+    <!-- Tab navs -->
+    <div
+      class="nav flex-column nav-tabs"
+      id="v-tabs-tab"
+      role="tablist"
+      aria-orientation="vertical"
+    >
+        <a
+            class="nav-link active"
+            id="all"
+            data-mdb-toggle="tab"
+            href="#content_all"
+            role="tab"
+            aria-controls="all"
+            aria-selected="true"
+          >#All</a>
+        {% for i in range(0, hashtags|length) %}
+          <a
+            class="nav-link"
+            id="tab{{hashtags[i].id}}"
+            data-mdb-toggle="tab"
+            href="#content{{hashtags[i].id}}"
+            role="tab"
+            aria-controls="tab{{hashtags[i].id}}"
+            aria-selected="false"
+            onclick="get_posts({{hashtags[i].id}})"
+          >{{hashtags[i].content}}</a>
+        {% endfor %}
+    </div>
+    <!-- Tab navs -->
+  </div>
+
+  <div class="col-10">
+    <!-- Tab content -->
+    <div class="tab-content" id="v-tabs-tabContent">
+        <div
+            class="tab-pane fade show active"
+            id="content_all"
+            role="tabpanel"
+            aria-labelledby="all"
+          >
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for post in posts %}
+                {% include '_project.html' %}
+            {% endfor %}
+            </div>
+          </div>
+        {% for i in range(0, hashtags|length) %}
+        <div
+            class="tab-pane fade show"
+            id="content{{hashtags[i].id}}"
+            role="tabpanel"
+            aria-labelledby="tab{{hashtags[i].id}}"
+          >
+            Home content
+          </div>
+        {% endfor %}
+    </div>
+    <!-- Tab content -->
+  </div>
+</div>
+</div>
+<script>
+    function get_posts(i) {
+      $.post('/get_posts', {'hashtag_id': i})
+        .done(function(data) {
+          var divContent = document.querySelector(`#content${i}`);
+          var posts = data.posts;
+          var html = '<div class="row row-cols-1 row-cols-md-2 g-4">';
+          if (posts) {
+            console.log(posts);
+            for (post of posts) {
+                var username = post.username;
+                html += `
+                <div class="col">
+                    <div class="card">
+                      <div class="card-body" style="max-height: 400px; overflow: auto">
+                        <h5 class="card-title">${post.title}</h5>
+                        <table>
+                        <tr>
+                                <td><img src="${post.avatar}"></td>
+                                <td><a href="{{url_for('user', username=username) }}"><strong>${post.author}</strong></a><br>
+                                    ${post.timestamp}</td>
+                            </tr>
+                            <tr></tr>
+                      </table>
+                        <p class="card-text line-break-text">
+                          ${post.content}
+                        </p>
+                      </div>
+                        <div class="card-footer">
+                        <small class="text-muted">`
+
+                var hts = '';
+                for (h of post.hashtags) {
+                    hts+= `<span class="me-2">${h}</span>`;
+                };
+                html += hts;
+                if (post.role == 'Nhà hảo tâm') {
+                    html += `</small>
+                             {% if current_user.is_authenticated %}
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-primary btn-sm ms-2">Tôi muốn tài trợ dự án này</button>
+                                <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+                                  <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            {% else %}
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-secondary  btn-sm ms-2">Tình nguyện/Tài trợ</button>
+                                <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+                                  <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>`;
+                } else {
+                    html += `</small>
+                            {% if current_user.is_authenticated %}
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-success btn-sm ms-2">Tôi muốn tình nguyện dự án này</button>
+                                <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+                                  <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            {% else %}
+                            <div class="d-flex flex-row-reverse">
+                                <button class="btn btn-secondary  btn-sm ms-2">Tình nguyện/Tài trợ</button>
+                                <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+                                  <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>`;
+                }
+            }
+          }
+          html += `</div>`;
+          divContent.innerHTML = html;
+        })
+        .fail(function() {
+          console.error("Lỗi khi gửi yêu cầu POST");
+        });
+    }
+
+</script>
+ {% endblock %}

@@ -1,0 +1,17 @@
+@media (min-width: 1025px) {
+    .h-custom {
+    height: 100% !important;
+    }
+}
+
+.line-break-text {
+    white-space: pre-line;
+}
+
+.hidden {
+    display: none;
+}
+
+.card {
+    background-color: #FAF3F0;
+}

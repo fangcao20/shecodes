@@ -1,0 +1,82 @@
+<div class="col">
+    <div class="card">
+      <div class="card-body" style="max-height: 400px; overflow: auto">
+        <h5 class="card-title">{{ post.title }}</h5>
+          <table>
+                <tr>
+                    <td><img src="{{ post.author.avatar(36) }}"></td>
+                    <td><a href="url_for('user', username=post.author.username)"><strong>{{ post.author.name }}</strong></a><br>
+                        {{ post.timestamp }}</td>
+                </tr>
+                <tr></tr>
+          </table>
+        <p class="card-text line-break-text">
+          {{ post.content }}
+        </p>
+      </div>
+        <div class="card-footer">
+        <small class="text-muted">
+            {% for h in post.hashtags %}
+                <span class="me-2">{{ h.content }}</span>
+            {% endfor %}
+        </small>
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == 'Nhà hảo tâm' %}
+            <div class="d-flex flex-row-reverse">
+                <button class="btn btn-primary btn-sm ms-2" data-mdb-toggle="modal" data-mdb-target="#tinhNguyen">Tôi muốn tài trợ dự án này</button>
+                <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+                  <i class="fas fa-heart"></i>
+                </button>
+            </div>
+             {% else %}
+             <div class="d-flex flex-row-reverse">
+                <button class="btn btn-success btn-sm ms-2" data-mdb-toggle="modal" data-mdb-target="#tinhNguyen">Tôi muốn tình nguyện dự án này</button>
+                <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+                  <i class="fas fa-heart"></i>
+                </button>
+            </div>
+            {% endif %}
+           {% else %}
+          <div class="d-flex flex-row-reverse">
+            <button class="btn btn-secondary btn-sm ms-2" data-mdb-toggle="modal" data-mdb-target="#exampleModal">Tình nguyện/Tài trợ</button>
+            <button type="button" class="btn btn-danger btn-floating btn-sm" data-mdb-ripple-color="dark">
+              <i class="fas fa-heart"></i>
+            </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">Vui lòng đăng nhập để thực hiện!</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="tinhNguyen" tabindex="-1" aria-labelledby="tinhNguyenLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tinhNguyenLabel">{{ post.author.name }}</h5>
+        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <p>Số điện thoại: {{ post.author.phone_number }}
+          <br>
+              Email: {{ post.author.email }}
+          </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>

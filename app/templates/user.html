@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5" style="width: 60%">
+    <div class="avatar">
+        <img src="{{ user.avatar(128) }}" alt="">
+        <h3 class="mt-2">{{ user.name }}</h3>
+    </div>
+    <div class="information">
+        <table>
+            <tr>
+                <td>
+                    <p  class="me-5">Tư cách tham gia: <strong>{{ user.role }}</strong><br>
+                    Năm sinh: {{ user.year }}<br>
+                    Nơi công tác: {{ user.work_place }}<br>
+                    {% if user.description %}
+                    Mô tả: {{ user.description }}<br>
+                    {% endif %}
+                    {% if user.last_seen %}Lần cuối đăng nhập: {{ user.last_seen }}{% endif %}
+                    </p>
+                </td>
+                {% if user.role != 'Nhà hảo tâm' %}
+                <td>
+                    Tổng số dự án: {{ user.posts.count() }}<br>
+                    Tổng số dự án được tài trợ: {{ user.sponsor_posts() }}
+                </td>
+                {% else %}
+                <td>
+                    Tổng số dự án đã tài trợ: {{ user.sponsor_posts() }}
+                </td>
+                {% endif %}
+            </tr>
+        </table>
+    </div>
+    {% if user.role != 'Nhà hảo tâm' %}
+    <div class="posting">
+        <form method="POST">
+            <input type="text" id="title" class="form-control mt-1" placeholder="Tiêu đề">
+            <textarea class="form-control mt-1" name="post_content" id="post_content" placeholder="Viết gì đó..."></textarea>
+            <input type="text" id="hashtag" class="form-control mt-1" placeholder="#Hashtag">
+            <button class="btn btn-primary btn-sm mt-2" id="button_posting" type="button">Đăng</button>
+        </form>
+    </div>
+    {% endif %}
+    <hr>
+    <div class="unfunded-projects">
+        {% if user.role != 'Nhà hảo tâm' %}
+        <h5 class="mt-4">Dự án</h5>
+        {% for post in posts %}
+            {% if not post.sponsor_id %}
+                {% include '_post.html' %}
+            {% endif %}
+        {% endfor %}
+        {% else %}
+        <h5 class="mt-4">Dự án đã tài trợ</h5>
+        {% endif %}
+    </div>
+    <hr>
+    <div class="funded-projects">
+        {% if user.role != 'Nhà hảo tâm' %}
+        <h5 class="mt-4">Dự án đã được tài trợ</h5>
+        {% for post in posts %}
+            {% if post.sponsor_id %}
+                {% include '_post.html' %}
+            {% endif %}
+        {% endfor %}
+        {% else %}
+        <h5 class="mt-4">Dự án quan tâm</h5>
+        {% endif %}
+    </div>
+</div>
+<script>
+    const textarea = document.getElementById('post_content');
+
+    textarea.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+    textarea.style.height = (textarea.scrollHeight) + 'px';
+
+    $('#button_posting').on('click', function() {
+    var textarea = document.getElementById('post_content');
+    var post_content = textarea.value;
+    var title = document.getElementById('title').value;
+    var hashtag = document.getElementById('hashtag').value;
+    document.getElementById('hashtag').value = '';
+    document.getElementById('title').value = '';
+    textarea.value = '';
+    textarea.style.height = '59px';
+    $.post('/create_post', { 'post_content': post_content, 'hashtag': hashtag, 'title': title })
+    .done(function(response) {
+        console.log(response);
+    })
+    .fail(function(error) {
+        console.error(error);
+    });
+    });
+
+    const postContents = document.querySelectorAll('.post-content');
+    for (post of postContents) {
+        const readMoreButton = post.nextElementSibling;
+        const originalContent = post.textContent;
+
+        const maxCharacters = 200;
+        if (post.textContent.length > maxCharacters) {
+            const truncatedContent = post.textContent.substring(0, maxCharacters);
+            post.textContent = truncatedContent;
+            readMoreButton.classList.remove('hidden');
+        }
+        readMoreButton.addEventListener('click', function () {
+            post.textContent = originalContent;
+            this.classList.add('hidden');
+        });
+    }
+</script>
+ {% endblock %}

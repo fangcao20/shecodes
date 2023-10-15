@@ -1,0 +1,27 @@
+<div class="card mt-3">
+  <div class="card-body" style="max-height: 500px; overflow: auto">
+    <h5 class="card-title">{{ post.title }}</h5>
+    <table>
+        <tr>
+            <td><img src="{{ post.author.avatar(36) }}"></td>
+            <td><strong>{{ post.author.name }}</strong><br>
+                {{ post.timestamp }}</td>
+        </tr>
+        <tr></tr>
+    </table>
+    <p class="card-text line-break-text">{{ post.content }}</p>
+
+  </div>
+    <div class="card-footer">
+        <small class="text-muted">
+            {% for h in post.hashtags %}
+                <span class="me-2">{{ h.content }}</span>
+            {% endfor %}
+        </small>
+         {% if post.sponsor_id %}
+        <div>
+            <i><img src="{{ post.sponsor.avatar(36) }}"> đã tài trợ cho dự án này.</i>
+        </div>
+    {% endif %}
+    </div>
+</div>
